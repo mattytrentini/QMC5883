@@ -13,5 +13,6 @@ Then open main.py in your IDE and run it.
 # Pictures
 ## QMC5883L board view
 ![alt text](https://github.com/octaprog7/QMC5883/blob/master/pics/board_5883.jpg)
+The inscription on the board (HMC5883L) is incorrect! All (almost) such boards have QMC5883L installed!
 ## IDE
 ![alt text](https://github.com/octaprog7/QMC5883/blob/master/pics/ide_5883.png)
