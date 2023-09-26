@@ -12,6 +12,6 @@ Then open main.py in your IDE and run it.
 
 # Pictures
 ## QMC5883L board view
-![alt text](https://github.com/octaprog7/RM3100/blob/master/pics/board_5883.jpg)
+![alt text](https://github.com/octaprog7/QMC5883/blob/master/pics/board_5883.jpg)
 ## IDE
-![alt text](https://github.com/octaprog7/RM3100/blob/master/pics/ide_5883.png)
+![alt text](https://github.com/octaprog7/QMC5883/blob/master/pics/ide_5883.png)
