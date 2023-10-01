@@ -39,9 +39,9 @@ class QMC5883L(geosensmod.GeoMagneticSensor, Iterator, TemperatureSensor):
         """Возвращает значение (Chip ID), которое равно 0xFF!"""
         return self._read_reg(0x0D)[0]
 
-    def get_temperature(self) -> [int, float]:
+    def get_temperature(self, coefficient: float = 0.02) -> [int, float]:
         raw = self._read_reg(0x07, 2)
-        return 0.02 * self.unpack("h", raw)[0]  # signed short
+        return coefficient * self.unpack("h", raw)[0]  # signed short
 
     def is_continuous_meas_mode(self):
         """Возвращает Истина, когда включен режим периодических измерений!"""
