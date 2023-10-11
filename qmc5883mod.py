@@ -16,6 +16,8 @@ class QMC5883L(geosensmod.GeoMagneticSensor, Iterator, TemperatureSensor):
     """QMC5883L or HMC5883L Geomagnetic Sensor."""
 
     def __init__(self, adapter: bus_service.BusAdapter, address: int = 0x0D):
+        self._buf_2 = bytearray((0 for _ in range(2)))  # для хранения
+        self._buf_6 = bytearray((0 for _ in range(6)))  # для хранения
         self._update_rate = 0
         # адрес 0x0D!
         check_value(address, (0x0D,), f"Invalid address value: {address}")
@@ -40,8 +42,10 @@ class QMC5883L(geosensmod.GeoMagneticSensor, Iterator, TemperatureSensor):
         return self._read_reg(0x0D)[0]
 
     def get_temperature(self, coefficient: float = 0.02) -> [int, float]:
-        raw = self._read_reg(0x07, 2)
-        return coefficient * self.unpack("h", raw)[0]  # signed short
+        # raw = self._read_reg(0x07, 2)
+        buf = self._buf_2
+        self.adapter.read_buf_from_mem(self.address, 0x07, buf)  # 16 bit value (int16)
+        return coefficient * self.unpack("h", buf)[0]  # signed short
 
     def is_continuous_meas_mode(self):
         """Возвращает Истина, когда включен режим периодических измерений!"""
@@ -83,12 +87,16 @@ class QMC5883L(geosensmod.GeoMagneticSensor, Iterator, TemperatureSensor):
 
     def read_raw(self, axis_name: int) -> int:
         addr_reg = geosensmod.axis_name_to_reg_addr(axis_name, offset=0, multiplier=2)
-        bts = self._read_reg(reg_addr=addr_reg, bytes_count=2)   # 16 bit value (int16)
-        return self.unpack('h', bts)[0]
+        buf = self._buf_2
+        self.adapter.read_buf_from_mem(self.address, addr_reg, buf)     # 16 bit value (int16)
+        # bts = self._read_reg(reg_addr=addr_reg, bytes_count=2)   # 16 bit value (int16)
+        return self.unpack('h', buf)[0]
 
     def _get_all_meas_result(self) -> tuple:
-        bts = self._read_reg(reg_addr=0, bytes_count=6)   # 3x16 bit value (int16)
-        return self.unpack('hhh', bts)
+        buf = self._buf_6
+        # для уменьшения выделения/возвращения памяти сборщиком мусора (gc)
+        self.adapter.read_buf_from_mem(self.address, 0, buf)
+        return self.unpack('hhh', buf)
 
     def get_conversion_cycle_time(self) -> int:
         """Возвращает время, в микросекундах(!), преобразования датчиком в зависимости от его настроек.

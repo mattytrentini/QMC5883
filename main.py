@@ -28,6 +28,7 @@ if __name__ == '__main__':
     i2c = I2C(id=1, scl=Pin(7), sda=Pin(6), freq=400_000)  # create I2C peripheral at frequency of 400kHz
     adapter = I2cAdapter(i2c)  # адаптер для стандартного доступа к шине
     delay_func = time.sleep_ms
+    tc = .0175  # temperature coefficient
 
     sensor = qmc5883mod.QMC5883L(adapter)
     print(f"Sensor id: {sensor.get_id()}")
@@ -44,7 +45,7 @@ if __name__ == '__main__':
         delay_func(wt)
         if mf_comp:
             x = math.sqrt(sum(map(lambda val: val ** 2, mf_comp)))  # напряженность магнитного поля в условных ед.
-            print(f"X: {mf_comp[0]}; Y: {mf_comp[1]}; Z: {mf_comp[2]}; temperature: {sensor.get_temperature()}, {x}")
+            print(f"X: {mf_comp[0]}; Y: {mf_comp[1]}; Z: {mf_comp[2]}; temp.[°C]: {sensor.get_temperature(tc)}, {x}")
         index += 1
         if index > 30:
             break
@@ -58,7 +59,7 @@ if __name__ == '__main__':
         delay_func(wt)
         if mf_comp:
             x = math.sqrt(sum(map(lambda val: val ** 2, mf_comp)))  # напряженность магнитного поля в условных ед.
-            print(f"X: {mf_comp[0]}; Y: {mf_comp[1]}; Z: {mf_comp[2]}; temperature: {sensor.get_temperature()}, {x}")
+            print(f"X: {mf_comp[0]}; Y: {mf_comp[1]}; Z: {mf_comp[2]}; temp.[°C]: {sensor.get_temperature(tc)}, {x}")
 
     # while True:
     #     if sensor.is_data_ready():
